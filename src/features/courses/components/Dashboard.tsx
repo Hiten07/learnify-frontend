@@ -38,13 +38,13 @@ const Dashboard = () => {
       setLoading(true);
       const response = await getApis("/courses/mycourses", queryParams);
 
-      if (response.data.courses.length > 0) {
-        setCoursedata(response.data.courses);
+      if (response?.data?.courses.length > 0) {
+        setCoursedata(response?.data.courses);
         // setFilteredCourseData(response.data.courses);
-        setTotalCourseCreated(response.data.totalItems);
+        setTotalCourseCreated(response?.data.totalItems);
         setPagination({
-          page: response.data.currentPage,
-          totalPages: response.data.totalPages,
+          page: response?.data.currentPage,
+          totalPages: response?.data.totalPages,
         });
       }
 

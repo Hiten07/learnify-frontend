@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { progressBar } from "../../student/types/progreess.types";
+import { progressBar } from "../../student/types/progress.types";
 
 const ProgressBar = ({
   progress,

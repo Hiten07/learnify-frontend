@@ -10,7 +10,7 @@ import { showToastMessage } from "../../../utils/Toast.errors";
 import { useAuthContext } from "../../../hooks/Createcontext";
 import { useNavigate } from "react-router-dom";
 import ProgressBar from "../../student/components/Progressbar";
-import { progressbarDetails } from "../../student/types/progreess.types";
+import { progressbarDetails } from "../../student/types/progress.types";
 
 const Coursematerial = () => {
   const [courseData, setCourseData] = useState([]);
@@ -70,7 +70,7 @@ const Coursematerial = () => {
         navigate(`/courses/${courseid}`, {
           state: coursedetails.state,
         });
-        showToastMessage(result.message, 200);
+        showToastMessage(result?.message, 200);
       }
       setLoading(false);
     } catch (error) {
@@ -88,7 +88,7 @@ const Coursematerial = () => {
       try {
         const res = await getApis(`/coursecontent`, queryParams);
         if (res) {
-          setCourseData(res.data);
+          setCourseData(res?.data);
         }
       } catch (error) {
         console.log(error);
@@ -103,8 +103,8 @@ const Coursematerial = () => {
             "/enrollcourses/trackprogress",
             queryParams
           );
-          console.log(result.data, "this is data");
-          setProgressBar(result.data);
+          console.log(result?.data, "this is data");
+          setProgressBar(result?.data);
         } catch (error) {
           console.log(error);
         }
