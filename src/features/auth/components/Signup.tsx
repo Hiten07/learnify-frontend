@@ -8,7 +8,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import "../../../App.css";
 import { showToastMessage } from "../../../utils/Toast.errors";
-// import { showToastMessage } from "../../../utils/Toast.errors";
 
 type Inputs = {
   firstname?: string;
