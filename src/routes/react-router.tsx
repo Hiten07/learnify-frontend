@@ -1,11 +1,11 @@
 import { createBrowserRouter, type RouteObject } from "react-router";
-import  {StudentRoutes} from "../features/student/student.routes";
 import { AuthRoutes } from "../features/auth/auth.routes";
 import { CourseRoutes } from "../features/courses/course.routes";
 import { InstructorRoutes } from "../features/instructor/instructor.routes";
 import Home from "../components/Layouts/Home";
 import Dashboard from "../features/courses/components/Dashboard";
 import Notfoundpage from "../components/Layouts/Notfound";
+import  {StudentRoutes} from "../features/student/student.routes";
 
 
 const routes: RouteObject[] = [
