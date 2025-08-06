@@ -7,7 +7,7 @@ import { Optional } from 'utility-types';
 import { globalResponseInterface } from '../types/global.types';
 
 export const axiosinstance = axios.create({
-    baseURL: "http://localhost:3007",
+    baseURL: "https://lms-render-flnj.onrender.com",
     withCredentials: true
 })
 
