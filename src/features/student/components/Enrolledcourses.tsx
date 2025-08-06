@@ -1,14 +1,27 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 
 import { useEffect, useState,useCallback } from "react";
 import {getApis} from "../../../api/course.api";
 import { useNavigate } from "react-router-dom";
-import {coursedetails} from "../../courses/types/courses.types";
+import { courseDetails2 } from "../../courses/types/courses.types";
 import { convertStringDate } from "../../../utils/Convertstringtodate";
+
+interface courseArray {
+  courses: courseDetails2[];
+  currentPage: number;
+  totalItems: number;
+  totalPages: number;
+}
+
+interface responseInterface {
+  message: string;
+  data: courseArray;
+}
 
 const Enrolledcourses = () => {
 
   const navigate = useNavigate();
-  const [coursedata, setCoursedata] = useState([]);
+  const [coursedata, setCoursedata] = useState<courseDetails2[]>([]);
   const [loading, setLoading] = useState(false);
 
   const [pagination, setPagination] = useState({
@@ -26,7 +39,8 @@ const Enrolledcourses = () => {
     try 
     {
       setLoading(true);
-      const response = await getApis("/student/courses", queryParams);
+      const response = await getApis("/student/courses", queryParams) as responseInterface;
+      console.log(response,"enrolled")
       
       if (response.data.courses.length > 0) {
         setCoursedata(response.data.courses);
@@ -43,7 +57,7 @@ const Enrolledcourses = () => {
     }
   },[queryParams])
 
-  const Viewcoursematerial = async (coursedetails: coursedetails) => {
+  const Viewcoursematerial = async (coursedetails: courseDetails2) => {
     console.log(coursedetails)
     const course = {
         coursename: coursedetails.coursename,
@@ -85,7 +99,7 @@ const Enrolledcourses = () => {
         (
             <>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {coursedata.map((course: coursedetails) => (
+                        {coursedata.map((course: courseDetails2) => (
                            <div
                             className="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300"
                             key={course.courseid}

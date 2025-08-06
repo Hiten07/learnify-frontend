@@ -6,6 +6,7 @@ import authApis from "../../../api/auth.api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { verifyOtpSchema } from "../models/index";
 import { showToastMessage } from "../../../utils/Toast.errors";
+import { globalResponseInterface } from "../../../types/global.types";
 // import { showToastMessage } from "../../../utils/Toast.errors";
 
 type otpType = {
@@ -29,8 +30,8 @@ export const Verifyotp = () => {
 
       try {
         const verifyOtp = async () => {
-          const userDetailsToken = await authApis("/users/register/verify",otp);
-  
+          const userDetailsToken = await authApis("/users/register/verify",otp) as globalResponseInterface;
+          
           if(userDetailsToken) {
             showToastMessage(userDetailsToken.message,200);
             navigate("/users/login");

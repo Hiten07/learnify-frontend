@@ -17,7 +17,8 @@ export const UseAuthProvider = ({children}: MyContextProviderProps) => {
     const token = Cookies.get('authtoken');
     if (token) {
       setAuthToken(token);
-      setRole(Getrolefromtoken(token))
+      const token2 = Getrolefromtoken(token) as string;
+      setRole(token2)
     }
   }, []);
 

@@ -7,6 +7,35 @@ export interface coursedetails {
     courseid: number
 }
 
+export interface courseDetails {
+  courseid: number;
+  coursename: string;
+  courseprice: number;
+  createdAt: string;
+  deletedAt: string | null;
+  description: string;
+  duration: number;
+  instructorid: number;
+  updatedAt: string;
+}
+
+export interface courseDetails2 {
+    courseid: number;
+    coursename: string;
+    courseprice: number;
+    createdAt: string;
+    deletedAt: string | null;
+    description: string;
+    duration: number;
+    instructorid: number;
+    updatedAt: string;
+    enrolledcourses: {
+        userid: number, 
+        enrolleddate: string, 
+        validuntildate: string
+    }[]
+  }
+
 interface Enrolledcoursedetails {
     userid: number,
     enrolleddate: string,

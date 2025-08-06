@@ -5,12 +5,35 @@ import {
   useFormContext,
 } from "react-hook-form";
 import { postApis, getApis } from "../../../api/course.api";
-import { moduleSchema2, ModuleSchemaForm } from "../models/Courseschema.zod";
+import { moduleSchema2, ModuleSchemaForm,lessonSchemaForm } from "../models/Courseschema.zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ReactNode, useState } from "react";
 import { Loader } from "../../../utils/Loader";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { showToastMessage } from "../../../utils/Toast.errors";
+
+interface ModuleInterface {
+    id: number;
+    title: string;
+    description: string;
+    lessons: lessonSchemaForm;
+}
+
+interface responseInterface {
+  data: ModuleInterface,
+  message: string
+}
+
+interface lessonInterface {
+  data: lessonSchemaForm,
+  message: string
+}
+
+interface moduleOrderInterface {
+  data: {
+    order: number
+  }
+}
 
 const LessonFields = ({ moduleIndex }: { moduleIndex: number }) => {
   const {
@@ -208,7 +231,8 @@ const AddCourseModule = () => {
 
       const result = await getApis("/courses/module/order", {
         courseid: courseid,
-      });
+      }) as moduleOrderInterface;
+
 
       for (const [moduleIndex, module] of data.modules.entries()) {
         const moduleResponse = await postApis(
@@ -219,10 +243,10 @@ const AddCourseModule = () => {
             order: ++result.data.order,
           },
           { courseid }
-        );
+        ) as responseInterface;
 
-        const moduleId = moduleResponse.data.id;
-        showToastMessage(moduleResponse.message, 200);
+        const moduleId = moduleResponse?.data?.id;
+        showToastMessage(moduleResponse?.message, 200);
 
         for (const [lessonIndex, lesson] of module.lessons.entries()) {
           const lessonFormData = new FormData();
@@ -248,7 +272,7 @@ const AddCourseModule = () => {
             {
               moduleid: moduleId,
             }
-          );
+          ) as lessonInterface;
 
           setLoading(false);
           navigate(`/courses/${courseid}`, {

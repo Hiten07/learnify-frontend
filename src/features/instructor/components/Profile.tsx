@@ -1,20 +1,10 @@
 import { useEffect, useState } from "react";
 import { getApis } from "../../../api/course.api";
+import { ProfileData } from "../types/profile.types";
 
-interface ProfileData {
-  firstname: string;
-  lastname: string;
-  email: string;
-  phonenumber: string;
-  bio: string;
-  instructordetails: {
-    qualification: string;
-    experience: number;
-  };
-  paymentDetails?: {
-    upiId?: string;
-    bankAccount?: string;
-  };
+interface responseInterface {
+  data: ProfileData,
+  message: string
 }
 
 const Profile = () => {
@@ -38,9 +28,10 @@ const Profile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await getApis("/users/instructor/profile", {});
-        const data = response.data;
-        setProfile(response.data);
+        
+        const response = await getApis("/users/instructor/profile", {}) as responseInterface;
+        const data = response!.data as ProfileData;
+        setProfile(response!.data);
 
         setForm({
           firstname: data.firstname || "",

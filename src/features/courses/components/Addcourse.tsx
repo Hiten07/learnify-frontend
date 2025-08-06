@@ -1,80 +1,138 @@
-import { useForm, useFieldArray, FormProvider, useFormContext, UseFieldArrayRemove } from "react-hook-form";
+import {
+  useForm,
+  useFieldArray,
+  FormProvider,
+  useFormContext,
+  UseFieldArrayRemove,
+} from "react-hook-form";
 import { postApis } from "../../../api/course.api";
-import { courseSchema } from "../models/Courseschema.zod";
-import {zodResolver} from "@hookform/resolvers/zod";
+import { courseSchema, lessonSchemaForm, ModuleForm } from "../models/Courseschema.zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { CourseForm } from "../models/Courseschema.zod";
 import { ReactNode, useState } from "react";
 import { Loader } from "../../../utils/Loader";
 import { showToastMessage } from "../../../utils/Toast.errors";
 
+interface CourseInterface {
+  title: string;
+  price: number;
+  duration: number;
+  description: string;
+  courseid: number;
+  modules: ModuleForm;
+}
+
+interface ModuleInterface {
+  id: number;
+  title: string;
+  description: string;
+  lessons: lessonSchemaForm;
+}
+
+interface responseInterface {
+  message: string;
+  data: CourseInterface;
+}
+
+interface moduleresponseInterface {
+  message: string;
+  data: ModuleInterface;
+}
+
+interface lessonresponseInterface {
+  message: string;
+  data: lessonSchemaForm;
+}
 // useFormContext => custom hook that allows you to access the state and methods provided by formprovider
 // Formprovider => provides method & state to the nested components of component using react-hook-form
 
 const LessonFields = ({ moduleIndex }: { moduleIndex: number }) => {
-  
-  const { control, register, formState: {errors} } = useFormContext<CourseForm>();
+  const {
+    control,
+    register,
+    formState: { errors },
+  } = useFormContext<CourseForm>();
 
-  const { fields: lessonFields, append: appendLesson,remove: removeLesson } = useFieldArray({
+  const {
+    fields: lessonFields,
+    append: appendLesson,
+    remove: removeLesson,
+  } = useFieldArray({
     control,
     name: `modules.${moduleIndex}.lessons`,
   });
 
   return (
-
-
     <div>
       {lessonFields.map((lesson, lessonIndex) => (
         <div className="py-5  " key={lesson.id}>
-          <h4 className="font-xl font-bold text-blue-600 mb-4">Lesson {lessonIndex + 1}</h4>
+          <h4 className="font-xl font-bold text-blue-600 mb-4">
+            Lesson {lessonIndex + 1}
+          </h4>
 
           <label className="block text-gray-700 font-semibold mb-1">
-             Lesson Title
+            Lesson Title
           </label>
           <input
             {...register(`modules.${moduleIndex}.lessons.${lessonIndex}.title`)}
-            className={`w-full px-3 py-2 mb-4 border ${errors.title ? "border-red-500" : "border-gray-300"} rounded`}
+            className={`w-full px-3 py-2 mb-4 border ${
+              errors.title ? "border-red-500" : "border-gray-300"
+            } rounded`}
             placeholder="Lesson Title"
             required
           />
-          {errors.modules?.[moduleIndex]?.lessons?.[lessonIndex]?.title?.message && (
+          {errors.modules?.[moduleIndex]?.lessons?.[lessonIndex]?.title
+            ?.message && (
             <p className="text-red-500 text-sm">
               {errors.modules[moduleIndex].lessons[lessonIndex].title?.message}
             </p>
           )}
 
-
           <label className="block text-gray-700 font-semibold mb-1">
-                  Lesson Description :
+            Lesson Description :
           </label>
           <input
-            {...register(`modules.${moduleIndex}.lessons.${lessonIndex}.description`)}
-            className={`w-full px-3 py-2 border mb-4 ${errors.title ? "border-red-500" : "border-gray-300"} rounded`}
+            {...register(
+              `modules.${moduleIndex}.lessons.${lessonIndex}.description`
+            )}
+            className={`w-full px-3 py-2 border mb-4 ${
+              errors.title ? "border-red-500" : "border-gray-300"
+            } rounded`}
             placeholder="Lesson Description"
             required
           />
-          {errors.modules?.[moduleIndex]?.lessons?.[lessonIndex]?.description?.message && (
-                      <p className="text-red-500 text-sm">
-                        {errors.modules[moduleIndex].lessons[lessonIndex].description?.message}
-                      </p>
+          {errors.modules?.[moduleIndex]?.lessons?.[lessonIndex]?.description
+            ?.message && (
+            <p className="text-red-500 text-sm">
+              {
+                errors.modules[moduleIndex].lessons[lessonIndex].description
+                  ?.message
+              }
+            </p>
           )}
 
           <label className="block text-gray-700 font-semibold mb-1">
-             Video Lesson : 
+            Video Lesson :
           </label>
 
           <input
             type="file"
             accept="video/*"
-            className={`w-full px-3 py-2 border mb-4 ${errors.title ? "border-red-500" : "border-gray-300"} rounded`}
+            className={`w-full px-3 py-2 border mb-4 ${
+              errors.title ? "border-red-500" : "border-gray-300"
+            } rounded`}
             {...register(`modules.${moduleIndex}.lessons.${lessonIndex}.video`)}
             required
           />
-             {errors.modules?.[moduleIndex]?.lessons?.[lessonIndex]?.video && (
+          {errors.modules?.[moduleIndex]?.lessons?.[lessonIndex]?.video && (
             <p className="text-red-500 text-sm">
-              {errors?.modules?.[moduleIndex].lessons?.[lessonIndex].video?.message as ReactNode}
+              {
+                errors?.modules?.[moduleIndex].lessons?.[lessonIndex].video
+                  ?.message as ReactNode
+              }
             </p>
           )}
-          
+
           <label className="block text-gray-700 font-semibold mb-1">
             PDF Lesson :
           </label>
@@ -82,29 +140,32 @@ const LessonFields = ({ moduleIndex }: { moduleIndex: number }) => {
           <input
             type="file"
             accept="application/pdf"
-            className={`w-full px-3 py-2 border mb-4 ${errors.title ? "border-red-500" : "border-gray-300"} rounded`}
+            className={`w-full px-3 py-2 border mb-4 ${
+              errors.title ? "border-red-500" : "border-gray-300"
+            } rounded`}
             {...register(`modules.${moduleIndex}.lessons.${lessonIndex}.pdf`)}
           />
-             {errors.modules?.[moduleIndex]?.lessons?.[lessonIndex]?.pdf && (
+          {errors.modules?.[moduleIndex]?.lessons?.[lessonIndex]?.pdf && (
             <p className="text-red-500 text-sm">
-              {errors.modules?.[moduleIndex]?.lessons[lessonIndex].pdf?.message as ReactNode}
+              {
+                errors.modules?.[moduleIndex]?.lessons[lessonIndex].pdf
+                  ?.message as ReactNode
+              }
             </p>
           )}
 
           {errors?.modules?.[moduleIndex]?.lessons && (
-              <p>
-              {errors?.modules?.[moduleIndex]?.lessons.message}
-            </p>
+            <p>{errors?.modules?.[moduleIndex]?.lessons.message}</p>
           )}
-             
 
-        <button
-                type="button"
-                className="p-2 m-4 text-white" 
-                onClick={() => removeLesson(lessonIndex)}
-                disabled={lessonFields.length === 1}>
-                remove lesson
-        </button>
+          <button
+            type="button"
+            className="p-2 m-4 text-white"
+            onClick={() => removeLesson(lessonIndex)}
+            disabled={lessonFields.length === 1}
+          >
+            remove lesson
+          </button>
         </div>
       ))}
 
@@ -130,26 +191,34 @@ const LessonFields = ({ moduleIndex }: { moduleIndex: number }) => {
 const ModuleFields = ({
   moduleIndex,
   moduleId,
-  removeModule
+  removeModule,
 }: {
   moduleIndex: number;
   moduleId: string;
-  removeModule: UseFieldArrayRemove
+  removeModule: UseFieldArrayRemove;
 }) => {
-  const { register,formState: {errors}
- } = useFormContext<CourseForm>();
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext<CourseForm>();
 
   return (
     <div className="py-10" key={moduleId}>
-      <h3 className="py-2 text-xl font-bold text-blue-600">Module {moduleIndex + 1}</h3>
+      <h3 className="py-2 text-xl font-bold text-blue-600">
+        Module {moduleIndex + 1}
+      </h3>
 
       <label className="block text-gray-700 font-semibold mb-1">
-          Module Title :
-        </label>
+        Module Title :
+      </label>
       <input
         {...register(`modules.${moduleIndex}.title`)}
         className={`w-full px-3 py-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500
-        ${errors.modules?.[moduleIndex]?.title ? "border-red-500" : "border-gray-300"}`}
+        ${
+          errors.modules?.[moduleIndex]?.title
+            ? "border-red-500"
+            : "border-gray-300"
+        }`}
         placeholder="Module Title"
         required
       />
@@ -160,12 +229,16 @@ const ModuleFields = ({
       )}
 
       <label className="block text-gray-700 font-semibold mb-1">
-          Module Description :
+        Module Description :
       </label>
       <input
         {...register(`modules.${moduleIndex}.description`)}
         className={`w-full px-3 py-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500
-        ${errors?.modules?.[moduleIndex]?.description ? "border-red-500" : "border-gray-300"}`}
+        ${
+          errors?.modules?.[moduleIndex]?.description
+            ? "border-red-500"
+            : "border-gray-300"
+        }`}
         placeholder="Module Description"
         required
       />
@@ -177,11 +250,11 @@ const ModuleFields = ({
 
       <button
         type="button"
-        className="p-2 m-4 text-white" 
-        onClick={() => removeModule(moduleIndex)}>
+        className="p-2 m-4 text-white"
+        onClick={() => removeModule(moduleIndex)}
+      >
         remove module
       </button>
-
 
       <LessonFields moduleIndex={moduleIndex} />
 
@@ -213,18 +286,27 @@ const AddCourse = () => {
     },
   });
 
-  const [loading,setLoading] = useState(false);
-  const { control, register, reset, formState: { errors }, handleSubmit} = methods;
-  const { fields: moduleFields, append: appendModule, remove: removeModule } = useFieldArray({
+  const [loading, setLoading] = useState(false);
+  const {
+    control,
+    register,
+    reset,
+    formState: { errors },
+    handleSubmit,
+  } = methods;
+  const {
+    fields: moduleFields,
+    append: appendModule,
+    remove: removeModule,
+  } = useFieldArray({
     control,
     name: "modules",
   });
 
-
   const onSubmit = async (data: CourseForm) => {
     try {
       setLoading(true);
-      const courseResponse = await postApis(
+      const courseResponse = (await postApis(
         "/courses/create",
         {
           coursename: data.title,
@@ -233,34 +315,36 @@ const AddCourse = () => {
           duration: data.duration,
         },
         {}
-      );
+      )) as responseInterface;
 
       if (!courseResponse) throw new Error("Failed to create course");
-      showToastMessage(courseResponse.message,200);
+      showToastMessage(courseResponse.message, 200);
       const courseId = courseResponse.data.courseid;
 
       // 2. Create Modules
       for (const module of data.modules) {
         let order = 1;
-        const moduleResponse = await postApis("/courses/module",
-        {
-          title: module.title,
-          description: module.description,
-          order: order++
-        },
-        {
-          courseid: courseId
-        })
+        const moduleResponse = (await postApis(
+          "/courses/module",
+          {
+            title: module.title,
+            description: module.description,
+            order: order++,
+          },
+          {
+            courseid: courseId,
+          }
+        )) as moduleresponseInterface;
 
         if (!moduleResponse) throw new Error("Failed to create module");
 
         const moduleId = moduleResponse.data.id;
-        showToastMessage(moduleResponse.message,200);
+        showToastMessage(moduleResponse.message, 200);
 
         // 3. Create Lessons
         for (const lesson of module.lessons) {
           const lessonFormData = new FormData();
-          
+
           lessonFormData.append("title", lesson.title);
           lessonFormData.append("description", lesson.description);
 
@@ -268,182 +352,174 @@ const AddCourse = () => {
             lessonFormData.append("videos", lesson.video[0]);
           }
           if (lesson.pdf?.[0] && lesson.pdf.length > 0) {
-           lessonFormData.append("docs", lesson.pdf[0]);
+            lessonFormData.append("docs", lesson.pdf[0]);
           }
 
           for (const [key, value] of lessonFormData.entries()) {
             console.log(key, value);
           }
-          const lessonResponse = await postApis("/courses/module/lessons",
+          const lessonResponse = (await postApis(
+            "/courses/module/lessons",
             lessonFormData,
             {
-              moduleid: moduleId
-            })
+              moduleid: moduleId,
+            }
+          )) as lessonresponseInterface;
 
-          if (!lessonResponse) throw new Error("Failed to create lesson");     
-    
+          if (!lessonResponse) throw new Error("Failed to create lesson");
+
           reset();
           setLoading(false);
-          showToastMessage(lessonResponse.message,200);
-          
+          showToastMessage(lessonResponse.message, 200);
         }
       }
-    
     } catch (error) {
       console.error(error);
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="p-12 max-w-5xl mx-auto shadow-md bg-gradient-to-br from-blue-50 via-white to-green-50 shadow-lg mt-20" style={{backgroundColor : "rgb(245, 245, 245)"}}>
-        <FormProvider {...methods}>
-
+    <div
+      className="p-12 max-w-5xl mx-auto shadow-md bg-gradient-to-br from-blue-50 via-white to-green-50 shadow-lg mt-20"
+      style={{ backgroundColor: "rgb(245, 245, 245)" }}
+    >
+      <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          {loading && <Loader/>}
+          {loading && <Loader />}
           <div>
-        <h2 className="text-2xl font-bold text-center text-blue-600 mb-4">Add Course</h2>
+            <h2 className="text-2xl font-bold text-center text-blue-600 mb-4">
+              Add Course
+            </h2>
 
-        <label className="block text-gray-700 font-semibold mb-1">
-          Course Title :
-        </label>
+            <label className="block text-gray-700 font-semibold mb-1">
+              Course Title :
+            </label>
 
-        <input
-          {...register("title")}
-          type="text"
-          placeholder="Course Title"
-          className={`w-full px-3 py-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 
+            <input
+              {...register("title")}
+              type="text"
+              placeholder="Course Title"
+              className={`w-full px-3 py-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 
           ${errors.title ? "border-red-500" : "border-gray-300"}`}
-          required
-        />
+              required
+            />
 
-        {errors.title && (
-          <p className="text-red-500 text-sm">
-            {errors.title.message}
-          </p>
-        )}
+            {errors.title && (
+              <p className="text-red-500 text-sm">{errors.title.message}</p>
+            )}
 
-        <label className="block text-gray-700 font-semibold mb-1">
-          Course Price :
-        </label>
+            <label className="block text-gray-700 font-semibold mb-1">
+              Course Price :
+            </label>
 
-        <input
-          {...register("price",{
-            valueAsNumber: true
-          })}
-          type="number"
-          placeholder="Course Price"
-          className={`w-full px-3 py-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 
+            <input
+              {...register("price", {
+                valueAsNumber: true,
+              })}
+              type="number"
+              placeholder="Course Price"
+              className={`w-full px-3 py-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 
             ${errors.price ? "border-red-500" : "border-gray-300"}`}
-          required
-        />
-        
-        {errors.price && (
-          <p className="text-red-500 text-sm">
-            {errors.price.message}
-          </p>
-        )}
+              required
+            />
 
-        <label className="block text-gray-700 font-semibold mb-1">
-          Course Description :
-        </label>
+            {errors.price && (
+              <p className="text-red-500 text-sm">{errors.price.message}</p>
+            )}
 
-        <textarea
-          {...register("description")}
-          placeholder="Course Description"
-          className={`w-full px-3 py-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 
+            <label className="block text-gray-700 font-semibold mb-1">
+              Course Description :
+            </label>
+
+            <textarea
+              {...register("description")}
+              placeholder="Course Description"
+              className={`w-full px-3 py-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 
           ${errors.description ? "border-red-500" : "border-gray-300"}`}
-          required
-        />
+              required
+            />
 
-        {errors.description && (
-          <p className="text-red-500 text-sm">
-            {errors.description.message}
-          </p>
-        )}
+            {errors.description && (
+              <p className="text-red-500 text-sm">
+                {errors.description.message}
+              </p>
+            )}
 
-        <label className="block text-gray-700 font-semibold mb-1">
-          Course Duration :
-        </label>
+            <label className="block text-gray-700 font-semibold mb-1">
+              Course Duration :
+            </label>
 
-        <input
-            type="number"
-          {...register("duration",{
-            valueAsNumber: true
-          })}
-          placeholder="Course Duration ( In days )"
-          className={`w-full px-3 py-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 
-            ${ errors.duration ? "border-red-500" : "border-gray-300" }`} required />
+            <input
+              type="number"
+              {...register("duration", {
+                valueAsNumber: true,
+              })}
+              placeholder="Course Duration ( In days )"
+              className={`w-full px-3 py-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 
+            ${errors.duration ? "border-red-500" : "border-gray-300"}`}
+              required
+            />
 
-        <hr />
+            <hr />
 
-        {errors.duration && (
-          <p className="text-red-500 text-sm">
-            {errors.duration.message}
-          </p>
-        )}
+            {errors.duration && (
+              <p className="text-red-500 text-sm">{errors.duration.message}</p>
+            )}
+          </div>
 
-      </div>
+          {errors.modules && (
+            <p className="text-red-500 text-sm">{errors.modules.message}</p>
+          )}
 
+          {moduleFields.map((module, moduleIndex) => (
+            <ModuleFields
+              key={module.id}
+              moduleIndex={moduleIndex}
+              moduleId={module.id}
+              removeModule={removeModule}
+            />
+          ))}
 
-        {errors.modules && (
-          <p className="text-red-500 text-sm">
-            {errors.modules.message}
-          </p>
-        )}
-    
-
-        {moduleFields.map((module, moduleIndex) => (
-          <ModuleFields
-          key={module.id}
-          moduleIndex={moduleIndex}
-          moduleId={module.id}
-          removeModule={removeModule}
-          />
-        ))}
-
-        <button
-          type="button"
-          className="p-2 m-4 text-white"
-          onClick={() =>
-            appendModule({
-              title: "",
-              description: "",
-              lessons: [
-                {
-                  title: "",
-                  description: "",
-                  video: undefined,
-                  pdf: undefined,
-                },
-              ],
-            })
-          }
-        >
-          {" "}
-          Add Module
-        </button>
- 
-        <button 
-          type="submit" 
-          disabled={loading}
-          className="p-2 m-4 text-white"
+          <button
+            type="button"
+            className="p-2 m-4 text-white"
+            onClick={() =>
+              appendModule({
+                title: "",
+                description: "",
+                lessons: [
+                  {
+                    title: "",
+                    description: "",
+                    video: undefined,
+                    pdf: undefined,
+                  },
+                ],
+              })
+            }
           >
-           {loading ? "Adding course.." : "Add Course"}
-        </button>
-        <button
-          type="reset"
-          className="p-2 m-4 text-white"
-          onClick={() => reset
-          }
-        >
-          reset
-        </button>
+            {" "}
+            Add Module
+          </button>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="p-2 m-4 text-white"
+          >
+            {loading ? "Adding course.." : "Add Course"}
+          </button>
+          <button
+            type="reset"
+            className="p-2 m-4 text-white"
+            onClick={() => reset}
+          >
+            reset
+          </button>
         </form>
-    
-        </FormProvider>
+      </FormProvider>
     </div>
   );
 };

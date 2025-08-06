@@ -23,7 +23,7 @@ export const moduleSchema2 = z.object({
   modules: z.array(moduleSchema).min(1, "Course must have at least one module"),
 });
 
-export const courseSchema = z.object({
+export const courseSchema = z.object({   
   title: z.string().min(5, "Course title must be 6 characters long"),
   price: z.number().min(99, "Course price must be greater than 99"),
   duration: z.number().min(30, "Course duration in days must be greater than 30"),

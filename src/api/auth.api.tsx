@@ -1,6 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { showToastMessage } from "../utils/Toast.errors";
 import { axiosinstance } from "./Responseinterceptors";
 import "react-toastify/dist/ReactToastify.css";
+
+interface responseInterfaceobjtoken {
+  token: string
+}
+
+interface responseInterface {
+  data: responseInterfaceobjtoken
+}
+
 
 // export const useCustomApi = () => {
 
@@ -37,16 +47,16 @@ const authApis = async (endpoint: string, data: unknown) => {
       headers: {
         "Content-Type": "application/json",
       },
-    });
+    }) as responseInterface;
 
-    if (result.data.token) {
+    if (result!.data!.token) {
       return result.data;
     } 
     else {
       return result;
     }
-  } catch (error) {
-    if (error!.response.data) {
+  } catch (error:any) {
+    if (error.response && error.response.data) {
       return;
     }
     if(!error) {

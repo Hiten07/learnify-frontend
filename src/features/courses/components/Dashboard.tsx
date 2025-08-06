@@ -1,12 +1,36 @@
-import { useEffect, useState, useCallback, useMemo } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useState, useCallback, useMemo, SetStateAction } from "react";
 import { getApis } from "../../../api/course.api";
 import { useNavigate } from "react-router-dom";
-import { coursedetails } from "../types/courses.types";
 import { debounce } from "../../../utils/Debouncing";
+
+interface courseDetails {
+  courseid: number;
+  coursename: string;
+  courseprice: number;
+  createdAt: string;
+  deletedAt: string | null;
+  description: string;
+  duration: number;
+  instructorid: number;
+  updatedAt: string;
+}
+
+interface courseArray {
+  courses: courseDetails[];
+  currentPage: number;
+  totalItems: number;
+  totalPages: number;
+}
+
+interface responseInterface {
+  message: string;
+  data: courseArray;
+}
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [coursedata, setCoursedata] = useState([]);
+  const [coursedata, setCoursedata] = useState<courseDetails[]>([]);
   // const [filteredCourseData, setFilteredCourseData] = useState([])
   // const [coursedatacopy, setCoursedatacopy] = useState([]);
   const [loading, setLoading] = useState(false); 
@@ -25,9 +49,9 @@ const Dashboard = () => {
     search: "",
   };
 
-  const handleSearchSubmit = useCallback((e) => {
+  const handleSearchSubmit = useCallback((e: { target: { value: SetStateAction<string>; }; }) => {
     setSearchData(e.target.value);
-    queryParams.search = e.target.value;
+    queryParams.search = e.target.value as string;
     queryParams.page = "1"
     debounceFetchedData(e.target.value);
   },[]);
@@ -36,8 +60,8 @@ const Dashboard = () => {
 
     try {
       setLoading(true);
-      const response = await getApis("/courses/mycourses", queryParams);
-
+      const response = await getApis("/courses/mycourses", queryParams) as responseInterface;
+      console.log(response,"hi")
       if (response?.data?.courses.length > 0) {
         setCoursedata(response?.data.courses);
         // setFilteredCourseData(response.data.courses);
@@ -61,7 +85,7 @@ const Dashboard = () => {
   },[fetchAllInstructorCourses]) 
 
 
-  const Viewcoursematerial = async (coursedetails: coursedetails) => {
+  const Viewcoursematerial = async (coursedetails: courseDetails) => {
     const course = {
       coursename: coursedetails.coursename,
       coursedescription: coursedetails.description,
@@ -137,7 +161,7 @@ const Dashboard = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {coursedata.map((course: coursedetails) => (
+              {coursedata.map((course: courseDetails) => (
                 <div
                   className="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300"
                   key={course.courseid}

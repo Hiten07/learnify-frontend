@@ -10,6 +10,11 @@ import { Loader } from "../../../utils/Loader";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { showToastMessage } from "../../../utils/Toast.errors";
 
+interface lessonInterface {
+  data: lessonSchemaForm,
+  message: string
+}
+
 const AddLessonToCourseModule = () => {
   const methods = useForm<lessonSchemaForm>({
     resolver: zodResolver(lessonSchema2),
@@ -81,7 +86,7 @@ const AddLessonToCourseModule = () => {
             {
               moduleid: moduleid,
             }
-          );
+          ) as lessonInterface;
 
           if(lessonResponse) {
             setLoading(false);

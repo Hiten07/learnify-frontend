@@ -1,9 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import 'react-toastify/dist/ReactToastify.css';
 import { axiosinstance } from './Responseinterceptors';
-import { AxiosRequestConfig } from 'axios';
 import { showToastMessage } from '../utils/Toast.errors';
 
-const getApis = async (endpoint: string,queryParams: AxiosRequestConfig['params']) => {
+const getApis = async (endpoint: string,queryParams: any) => {
     try {
         const result = await axiosinstance.get(endpoint,
         {
@@ -26,7 +26,7 @@ const getApis = async (endpoint: string,queryParams: AxiosRequestConfig['params'
     }   
 }
 
-const postApis = async (endpoint: string,data: unknown,queryParams: AxiosRequestConfig['params']) => {
+const postApis = async (endpoint: string,data: unknown,queryParams: any) => {
     try {
         const result = await axiosinstance.post(endpoint,data,
         {
@@ -48,7 +48,7 @@ const postApis = async (endpoint: string,data: unknown,queryParams: AxiosRequest
     }   
 }
 
-const deleteApis = async (endpoint: string,queryParams: AxiosRequestConfig['params']) => {
+const deleteApis = async (endpoint: string,queryParams: any) => {
     try {
         const result = await axiosinstance.delete(endpoint,
         {

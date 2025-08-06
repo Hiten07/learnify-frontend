@@ -1,11 +1,35 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState, useCallback } from "react";
 import { getApis } from "../../../api/course.api";
 import { Loader } from "../../../utils/Loader";
-import { coursedetails } from "../../courses/types/courses.types";
 // import { useNavigate } from "react-router-dom";
 
+interface courseDetails {
+  courseid: number,
+  coursename: string,
+  courseprice: number,
+  createdAt: string,
+  deletedAt: string | null,
+  description: string,
+  duration: number,
+  instructorid: number
+  updatedAt: string
+}
+
+interface courseArray {
+courses: courseDetails[]
+currentPage: number,
+totalItems: number, 
+totalPages: number,
+}
+
+interface responseInterface {
+  message: string,
+  data: courseArray
+}
+
 const Dashboard = () => {
-  const [coursedata, setCoursedata] = useState([]);
+  const [coursedata, setCoursedata] = useState<courseDetails[]>([]);
   const [loading, setLoading] = useState(false);
 
   const [pagination, setPagination] = useState({
@@ -22,10 +46,9 @@ const Dashboard = () => {
   const fetchAllCourses = useCallback(async () => {
     try {
       setLoading(true);
-      console.log(queryParams.page)
-      const response = await getApis("/student/allcourses", queryParams);
-
-      if (response.data.courses.length > 0) {
+      const response = await getApis("/student/allcourses", queryParams) as responseInterface;
+      console.log(response)
+      if (response!.data.courses.length > 0) {
         setCoursedata(response.data.courses);
         setPagination({
           page: response.data.currentPage,
@@ -70,7 +93,7 @@ const Dashboard = () => {
         coursedata.length > 0 && (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {coursedata.map((course: coursedetails) => (
+              {coursedata.map((course: courseDetails) => (
                 <div
                   className="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300"
                   key={course.courseid}

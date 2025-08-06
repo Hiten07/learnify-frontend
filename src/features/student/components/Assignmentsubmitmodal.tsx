@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { allassignmentsdetails } from "../types/assignment.types";
+import { assignmentData } from "./Assignments";
 
 interface AssignmentSubmitModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (file: File, comments: string) => void;
-  assignment: allassignmentsdetails | null;
+  assignment: assignmentData | null;
 }
 
 const AssignmentSubmitModal: React.FC<AssignmentSubmitModalProps> = ({

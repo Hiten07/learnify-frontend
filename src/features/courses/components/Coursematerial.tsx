@@ -1,8 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import ReactPlayer from "react-player";
 import { useLocation, useParams } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import { getApis, postApis, deleteApis } from "../../../api/course.api";
-import { Coursemodule, CourseModulelessons } from "../types/courses.types";
 import { AddAssignmentModal } from "./AddAssignmentModal";
 import { Loader } from "../../../utils/Loader";
 import { AssignmentForm } from "../models/Assignment.zod";
@@ -12,8 +12,67 @@ import { useNavigate } from "react-router-dom";
 import ProgressBar from "../../student/components/Progressbar";
 import { progressbarDetails } from "../../student/types/progress.types";
 
+interface lessonSchemaFormInterface {
+  createdAt: string;
+  deletedAt: string | null;
+  description: string;
+  fileUrl: string;
+  id: number;
+  moduleid: number;
+  title: string;
+  updatedAt: string;
+  videoUrl: string;
+}
+
+interface trackprogressModule {
+  completedLessons: number;
+  courseid: number;
+  percentagenumber: number;
+  totallessons: number;
+}
+
+interface trackProgressInterface {
+  data: trackprogressModule;
+  message: string;
+}
+
+interface ModuleSchemaFormInterface {
+  description: string;
+  id: number;
+  lessons: lessonSchemaFormInterface[];
+  order: number;
+  title: string;
+}
+
+interface moduleInterface {
+  message: string;
+  data: ModuleSchemaFormInterface[];
+}
+
+interface AssignmentCreateInterface {
+  assignmentUrl: string;
+  courseid: number;
+  createdAt: string;
+  deletedAt: string | null;
+  description: string;
+  duedate: string;
+  id: number;
+  title: string;
+  updatedAt: string;
+}
+
+interface assignmentInterface {
+  message: string;
+  data: AssignmentCreateInterface;
+}
+
+interface moduleDeleteInterface {
+  data: number;
+  message: string;
+}
+
 const Coursematerial = () => {
-  const [courseData, setCourseData] = useState([]);
+  const [courseData, setCourseData] = useState<ModuleSchemaFormInterface[]>([]);
   const [showaddAssignmentModal, setshowaddAssignmentModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [progressBar, setProgressBar] = useState<progressbarDetails>({});
@@ -40,14 +99,14 @@ const Coursematerial = () => {
       }
       formdata.append("duedate", data.dueDate);
 
-      const response = await postApis(
+      const response = (await postApis(
         "/courses/create/assignments",
         formdata,
         queryParams
-      );
+      )) as assignmentInterface;
 
       if (response.message) {
-        showToastMessage(response.data.message, 200);
+        showToastMessage(response.message, 200);
         // setDisabled(false)
         setLoading(false);
         closeModel();
@@ -65,12 +124,15 @@ const Coursematerial = () => {
       moduleid: moduleid,
     };
     try {
-      const result = await deleteApis("/courses/module/delete", queryParams);
+      const result = (await deleteApis(
+        "/courses/module/delete",
+        queryParams
+      )) as moduleDeleteInterface;
       if (result) {
         navigate(`/courses/${courseid}`, {
           state: coursedetails.state,
         });
-        showToastMessage(result?.message, 200);
+        showToastMessage(result.message, 200);
       }
       setLoading(false);
     } catch (error) {
@@ -86,9 +148,12 @@ const Coursematerial = () => {
     setLoading(true);
     const fetchCourse = async () => {
       try {
-        const res = await getApis(`/coursecontent`, queryParams);
+        const res = (await getApis(
+          `/coursecontent`,
+          queryParams
+        )) as moduleInterface;
         if (res) {
-          setCourseData(res?.data);
+          setCourseData(res.data);
         }
       } catch (error) {
         console.log(error);
@@ -102,9 +167,8 @@ const Coursematerial = () => {
           const result = await getApis(
             "/enrollcourses/trackprogress",
             queryParams
-          );
-          console.log(result?.data, "this is data");
-          setProgressBar(result?.data);
+          ) as trackProgressInterface;
+          setProgressBar(result.data);
         } catch (error) {
           console.log(error);
         }
@@ -196,7 +260,7 @@ const Coursematerial = () => {
       {courseData && courseData.length == 0 ? (
         <p>No modules found, please add module</p>
       ) : (
-        courseData.map((module: Coursemodule) => (
+        courseData.map((module: ModuleSchemaFormInterface) => (
           <div key={module.id} className="mb-16 p-4 border rounded-lg">
             {authToken && role === "instructor" ? (
               <div className="flex justify-end mb-4 mr-16">
@@ -239,7 +303,7 @@ const Coursematerial = () => {
               {module.lessons.length == 0 ? (
                 <p>No lessons for module</p>
               ) : (
-                module.lessons?.map((lesson: CourseModulelessons) => (
+                module.lessons?.map((lesson: lessonSchemaFormInterface) => (
                   <div
                     key={lesson.id}
                     className="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 bg-white p-4 shadow-lg"

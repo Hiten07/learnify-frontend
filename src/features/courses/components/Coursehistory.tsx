@@ -2,21 +2,56 @@ import DataTable from "react-data-table-component";
 import { useEffect, useState } from "react";
 import { Loader } from "../../../utils/Loader";
 import { getApis } from "../../../api/course.api";
-import {
-  Coursepurchasehistory,
-  Enrolledcoursesandusersdetails,
-} from "../types/courses.types";
+// import { Coursepurchasehistory, Enrolledcoursesandusersdetails } from "../types/courses.types";
 import { convertStringDate } from "../../../utils/Convertstringtodate";
+
+interface TableRow {
+  coursename: string;
+  description: string;
+  enrolleddate: string;
+  firstname: string;
+  lastname: string;
+  email: string;
+}
+
+
+interface enrollmentDetails {
+  enrolleddate: string;
+  userid: number;
+  users: { id: number; firstname: string; lastname: string; email: string };
+  validuntildate: string;
+}
+
+interface enrolledHistoryDetails {
+  courseid: number;
+  coursename: string;
+  courseprice: number;
+  createdAt: string;
+  deletedAt: string | null;
+  description: string;
+  duration: number;
+  enrolledcourses: enrollmentDetails[];
+  instructorid: number;
+  updatedAt: string;
+}
+
+interface enrolledHistoryInterface {
+  data: {
+    count: number;
+    rows: enrolledHistoryDetails[];
+  };
+  message: string;
+}
 
 const Coursehistory = () => {
   const [loading, setLoading] = useState(false);
-  const [apiData, setApiData] = useState([]);
+  const [apiData, setApiData] = useState<enrolledHistoryDetails[]>();
 
   useEffect(() => {
     const fetchCourse = async () => {
       try {
         setLoading(true);
-        const res = await getApis(`/courses/history`, {});
+        const res = await getApis(`/courses/history`, {}) as enrolledHistoryInterface;
         if (res) {
           setApiData(res.data.rows);
         }
@@ -28,21 +63,30 @@ const Coursehistory = () => {
     };
     fetchCourse();
   }, []);
-
-  const tableData =
-    apiData?.flatMap(
-      (course: Coursepurchasehistory) =>
-        course.enrolledcourses?.map(
-          (enrolled: Enrolledcoursesandusersdetails) => ({
-            coursename: course?.coursename,
-            description: course?.description,
-            enrolleddate: enrolled?.enrolleddate,
-            firstname: enrolled?.users?.firstname || "-",
-            lastname: enrolled?.users?.lastname || "-",
-            email: enrolled?.users?.email || "-",
-          })
-        ) || []
-    ) || [];
+  const tableData = apiData?.flatMap((course) =>
+    course.enrolledcourses?.map((enrolled) => ({
+      coursename: course.coursename,
+      description: course.description,
+      enrolleddate: enrolled.enrolleddate,
+      firstname: enrolled.users?.firstname || "-",
+      lastname: enrolled.users?.lastname || "-",
+      email: enrolled.users?.email || "-",
+    })) 
+  ) as TableRow[] 
+  // const tableData =
+  //   apiData!.flatMap(
+  //     (course: Coursepurchasehistory) =>
+  //       course.enrolledcourses?.map(
+  //         (enrolled: Enrolledcoursesandusersdetails) => ({
+  //           coursename: course?.coursename,
+  //           description: course?.description,
+  //           enrolleddate: enrolled?.enrolleddate,
+  //           firstname: enrolled?.users?.firstname || "-",
+  //           lastname: enrolled?.users?.lastname || "-",
+  //           email: enrolled?.users?.email || "-",
+  //         })
+  //       ) || []
+  //   ) || [];
 
   const columns = [
     {

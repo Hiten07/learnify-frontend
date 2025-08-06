@@ -14,7 +14,7 @@ export interface assignmentDetailsCourseWise {
   deletedAt: string,
 }
 
-interface submissionsdetails {
+export interface submissionsdetails {
   userid?: number,
   courseid?: number,
   assignmentid?: number,

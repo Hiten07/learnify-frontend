@@ -18,6 +18,11 @@ type Inputs = {
   role?: string;
 };
 
+type userDetailsTokenInterface = {
+  message: string,
+  token: string
+}
+
 export const Signup = () => {
   const [userData, setUserdata] = useState({});
   const [showpassword,setShowPassword] = useState(false);
@@ -41,7 +46,7 @@ export const Signup = () => {
     }
     const registerUser = async () => {
       try {
-        const userDetailsToken = await authApis("/users/register", userData);
+        const userDetailsToken = await authApis("/users/register", userData) as userDetailsTokenInterface;
 
         if (userDetailsToken) {
           showToastMessage(userDetailsToken.message,200);

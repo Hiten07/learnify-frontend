@@ -3,7 +3,8 @@ import {toast} from "react-toastify";
 import { showToastMessage } from '../utils/Toast.errors';
 import Cookies from 'js-cookie';
 import axios from 'axios';
-
+import { Optional } from 'utility-types';
+import { globalResponseInterface } from '../types/global.types';
 
 export const axiosinstance = axios.create({
     baseURL: "http://localhost:3007",
@@ -18,7 +19,7 @@ axiosinstance.interceptors.request.use(
       const token = Cookies.get('authtoken');  
   
       if (token) {
-        config.headers.Authorization = `Bearer ${token}`; }
+        config!.headers!.Authorization = `Bearer ${token}`; }
       else {
         showToastMessage("Please login your account...", 401);
         window.location.href = "/users/login"; 
@@ -33,9 +34,10 @@ axiosinstance.interceptors.request.use(
 
 axiosinstance.interceptors.response.use(
     (response) => {
-      const data = response?.data;
-      if (data?.message && typeof data?.message === 'string') {
-        console.log(data.message);
+      const data = response.data as Optional<globalResponseInterface,'data'>;
+      console.log(response)
+      if (data!.message && typeof data!.message === 'string') {
+        console.log(data!.message);
       } 
   
       return response;

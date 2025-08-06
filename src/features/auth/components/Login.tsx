@@ -12,6 +12,8 @@ import { useAuthContext } from "../../../hooks/Createcontext";
 import { Getrolefromtoken } from "../../../utils/Getrolefromtoken";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { showToastMessage } from "../../../utils/Toast.errors";
+import { globalResponseInterface } from "../../../types/global.types";
+
 
 export const Login = () => {
   const [logindata, setLogindata] = useState({});
@@ -37,12 +39,13 @@ export const Login = () => {
     const registerUser = async () => {
       try {
         setLoading(true);
-        const userDetailsToken = await authApis("/users/login", logindata);
+        const userDetailsToken = await authApis("/users/login", logindata) as globalResponseInterface;
 
         if (userDetailsToken) {
           setLoading(false);
           setAuthToken(userDetailsToken.token);
-          setRole(Getrolefromtoken(userDetailsToken.token));
+          const token = Getrolefromtoken(userDetailsToken.token) as string;
+          setRole(token);
           showToastMessage(userDetailsToken.message,200);
           if (role === "instructor") {
             navigate("/dashboard");

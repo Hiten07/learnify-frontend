@@ -1,18 +1,46 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import { getApis, postApis } from "../../../api/course.api";
 import { Loader } from "../../../utils/Loader";
-import {
-  allassignmentsdetails,
-  assignmentDetailsCourseWise,
-} from "../types/assignment.types";
+import { submissionsdetails } from "../types/assignment.types";
 import AssignmentSubmitModal from "./Assignmentsubmitmodal";
 import { showToastMessage } from "../../../utils/Toast.errors";
 
+
+export interface assignmentData {
+  id: number;
+  title: string;
+  description: string;
+  assignmentUrl: string;
+  courseid: number;
+  duedate: string;
+  submissions: submissionsdetails[];
+  course: {
+    coursename: string;
+    description: string;
+    instructorid: number;
+  };
+  createdAt: string;
+  deletedAt: string | null;
+  updatedAt: string;
+}
+
+interface coursesAssignments {
+  courses: assignmentData[];
+  currentPage: number;
+  totalItems: number;
+  totalPages: number;
+}
+
+interface responseInterface {
+  message: string;
+  data: coursesAssignments;
+}
+
 const Assignments = () => {
   const [showmodel, setShowmodel] = useState<boolean>(false);
-  const [selectedAssignment, setSelectedAssignment] =
-    useState<allassignmentsdetails | null>(null);
-  const [assignmentsData, setAssignmentsData] = useState([]);
+  const [selectedAssignment, setSelectedAssignment] = useState<assignmentData | null>(null);
+  const [assignmentsData, setAssignmentsData] = useState<assignmentData[]>([]);
   const [loading, setLoading] = useState(false);
 
   const [pagination, setPagination] = useState({
@@ -20,7 +48,7 @@ const Assignments = () => {
     totalPages: 1,
   });
 
-  const openModel = (assignmentsData: allassignmentsdetails) => {
+  const openModel = (assignmentsData: assignmentData) => {
     setShowmodel(true);
     setSelectedAssignment(assignmentsData);
   };
@@ -43,14 +71,14 @@ const Assignments = () => {
       // formdata.append("comment",comment);
       console.log(comment);
 
-      const response = await postApis(
+      const response = (await postApis(
         "/student/submit/assignment",
         formdata,
         queryParams
-      );
-
+      )) as responseInterface;
+      console.log(response, "in assignment");
       if (response.message) {
-        showToastMessage(response.data.message, 200);
+        showToastMessage(response.message, 200);
         setLoading(false);
         closeModel();
       }
@@ -75,10 +103,11 @@ const Assignments = () => {
   const fetchAllEnrolledCoursesAssignments = async () => {
     try {
       setLoading(true);
-      const response = await getApis(
+      const response = (await getApis(
         "/student/assignments",
         queryParams
-      );
+      )) as responseInterface;
+
       if (response.data.courses.length > 0) {
         setAssignmentsData(response.data.courses);
         setPagination({
@@ -110,7 +139,7 @@ const Assignments = () => {
       {loading && <Loader />}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {assignmentsData.map((courseData: assignmentDetailsCourseWise) => (
+        {assignmentsData.map((courseData: assignmentData) => (
           // courseData.enrolledcourses.assignments.map(
           // (assignment: allassignmentsdetails) => (
           <div
@@ -140,7 +169,7 @@ const Assignments = () => {
             </p>
 
             {courseData.submissions.length > 0 ? (
-              courseData.submissions[0].isaccepted ? (
+              courseData.submissions && courseData!.submissions[0]!.isaccepted ? (
                 <button
                   className="bg-white-600 text-indigo px-4 py-2 rounded hover:bg-indigo-700 transition duration-300"
                   disabled={true}
