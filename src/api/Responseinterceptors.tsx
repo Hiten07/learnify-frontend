@@ -17,7 +17,6 @@ axiosinstance.interceptors.request.use(
         return config;
     }
       const token = Cookies.get('authtoken');  
-  
       if (token) {
         config!.headers!.Authorization = `Bearer ${token}`; }
       else {

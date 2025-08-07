@@ -40,7 +40,7 @@ export const Login = () => {
       try {
         setLoading(true);
         const userDetailsToken = await authApis("/users/login", logindata) as globalResponseInterface;
-
+        console.log(userDetailsToken)
         if (userDetailsToken) {
           setLoading(false);
           setAuthToken(userDetailsToken.token);
