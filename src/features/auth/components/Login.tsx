@@ -55,7 +55,6 @@ export const Login = () => {
         }
       } catch (error) {
         console.log(error);
-        // showToastMessage("something went wrong",501);
       } finally {
         setLoading(false);
       }
